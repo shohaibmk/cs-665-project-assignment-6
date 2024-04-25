@@ -2,40 +2,38 @@ package edu.bu.met.cs665.example1;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
+
+
 public class Billing {
+    private final Scanner scanner;
+    private final List<List<HashMap<String, int[]>>> drinksList;
+
+    public Billing() {
+        scanner = new Scanner(System.in);
+        drinksList = new ArrayList<>();
+    }
+
     public void createBill() {
         boolean exit = false;
         int choice;
-        ArrayList<ArrayList> drinksList = new ArrayList<>();
-        Scanner sc = new Scanner(System.in);
         do {
-            System.out.println("\n\nMenu:");
-            System.out.println("1)Add Coffee");
-            System.out.println("2)Add Tea");
-            System.out.println("3)View Order");
-            System.out.println("4)Remove Drinks");
-            System.out.println("5)Brew");
-            System.out.println("6)Exit");
-            System.out.println("Choice: ");
-            choice = sc.nextInt();
-            System.out.println(choice);
+            displayMenu();
+            choice = scanner.nextInt();
             switch (choice) {
                 case 1:
-                    Coffee coffee = new Coffee();
-
-                    drinksList.add(coffee.addCoffee());
+                    addDrink(new Coffee().addCoffee());
                     break;
                 case 2:
-                    Tea tea = new Tea();
-                    drinksList.add(tea.addTea());
+                    addDrink(new Tea().addTea());
                     break;
                 case 3:
-                    viewDrinks(drinksList);
+                    viewDrinks();
                     break;
                 case 4:
-                    drinksList = removeDrink(drinksList);
+                    removeDrink();
                     break;
                 case 5:
                     brew();
@@ -49,83 +47,66 @@ public class Billing {
         } while (!exit);
     }
 
+    private void displayMenu() {
+        System.out.println("\n\nMenu:");
+        System.out.println("1) Add Coffee");
+        System.out.println("2) Add Tea");
+        System.out.println("3) View Order");
+        System.out.println("4) Remove Drinks");
+        System.out.println("5) Brew");
+        System.out.println("6) Exit");
+        System.out.print("Choice: ");
+    }
+
+    /**
+     * method to add drinks to the drinks list
+     *
+     * @param drink
+     * return void
+     */
+    private void addDrink(List<HashMap<String, int[]>> drink) {
+        drinksList.add(drink);
+    }
+
     /**
      * method to brew the drink
      *
-     * @return Boolean
+     * @return void
      */
-    boolean brew() {
-
-        try {
-            //Code to brew coffee
-            System.out.println("Brewing Drinks for you !!!5\nplease be patient");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+    private void brew() {
+        System.out.println("Brewing Drinks for you!!!\nPlease be patient");
     }
 
     /**
      * View drinks list
      *
-     * @param drinksList
-     * @return Boolean
+     * @return void
      */
-    Boolean viewDrinks(ArrayList<ArrayList> drinksList) {
-        try {
-
-            System.out.println("Drinks:-");
-            int itemNumber = 1;
-            for (ArrayList drink : drinksList) {
-                System.out.print(itemNumber + ")");
-                if (drink.get(0) instanceof HashMap) {                             //Hashmap
-                    String coffeeName = ((HashMap<?, ?>) drink.get(0)).keySet().toArray()[0].toString();
-
-                    int[] condiments = (int[]) ((HashMap<?, ?>) drink.get(0)).get(coffeeName);
-                    System.out.println(coffeeName + " [milk: " + condiments[0] + ", sugar: " + condiments[1] + "]");
-
-                }
-                itemNumber++;
+    private void viewDrinks() {
+        System.out.println("Drinks:-");
+        int itemNumber = 1;
+        for (List<HashMap<String, int[]>> drink : drinksList) {
+            for (HashMap<String, int[]> drinkMap : drink) {
+                String drinkName = drinkMap.keySet().iterator().next();
+                int[] condiments = drinkMap.get(drinkName);
+                System.out.println(itemNumber++ + ") " + drinkName + " [milk: " + condiments[0] + ", sugar: " + condiments[1] + "]");
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
-        return true;
     }
 
     /**
      * Remove drinks from the drinks list
      *
-     * @param drinksList
-     * @return Arraylist
+     * @return void
      */
-    ArrayList removeDrink(ArrayList<ArrayList> drinksList) {
-        Scanner sc = new Scanner(System.in);
+    private void removeDrink() {
         try {
-            int choice;
-            int itemNumber = 1;
-            for (ArrayList drink : drinksList) {
-                System.out.print(itemNumber + ")");
-                if (drink.get(0) instanceof HashMap) {                             //Hashmap
-                    String coffeeName = ((HashMap<?, ?>) drink.get(0)).keySet().toArray()[0].toString();
-
-                    int[] condiments = (int[]) ((HashMap<?, ?>) drink.get(0)).get(coffeeName);
-                    System.out.println(coffeeName + " [milk: " + condiments[0] + ", sugar: " + condiments[1] + "]");
-
-                }
-                itemNumber++;
-            }
-            System.out.print("Choice: ");
-            choice = sc.nextInt();
+            System.out.println("Select drink to remove:");
+            viewDrinks();
+            int choice = scanner.nextInt();
             drinksList.remove(choice - 1);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Invalid choice!");
         }
-        return drinksList;
     }
-
-
 }
